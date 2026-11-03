@@ -33,17 +33,19 @@
 - **Môn học:** Phát triển ứng dụng Mobile App (CO3043) - Lớp L01
 - **Khoa:** Khoa Khoa học và Kỹ thuật Máy tính - Trường Đại học Bách Khoa, ĐHQG-HCM
 - **Giảng viên hướng dẫn:** ThS. Hoàng Lê Hải Thanh
+- **GitHub Repository:** [QuickAttend-Team/QuickAttend](https://github.com/QuickAttend-Team/QuickAttend)
+- **GitHub Wiki:** [QuickAttend Documentation Wiki](https://github.com/QuickAttend-Team/QuickAttend/wiki)
 
 ---
 
 ## 2. Thành viên nhóm
 
-| STT | Họ và tên | MSSV | Vai trò dự kiến | GitHub Profile |
+| STT | Họ và tên | MSSV | Vai trò trong dự án | GitHub Profile |
 |:---:|:---|:---:|:---|:---|
-| 1 | **Lâm Chí Nguyên** | 2412332 | Frontend Mobile Lead / Architecture | [@github-user](https://github.com) |
-| 2 | **Ngô Võ Gia Minh** | 2412069 | Backend API & Database Lead | [@github-user](https://github.com) |
-| 3 | **Nguyễn Hồng Thiện Nhân** | 2410670 | Mobile Feature Dev & UI/UX | [@github-user](https://github.com) |
-| 4 | **Nguyễn Huỳnh Tấn Phát** | 2412585 | QA / Testing, Geofencing & Hardware Auth | [@github-user](https://github.com) |
+| 1 | **Nguyễn Hồng Thiện Nhân** | 2410670 | **Git Manager / Backend API & Database Lead** | [@thiennhan](https://github.com) |
+| 2 | **Lâm Chí Nguyên** | 2412332 | **Frontend Mobile Lead / Architecture** | [@chinguyen](https://github.com) |
+| 3 | **Ngô Võ Gia Minh** | 2412069 | **Mobile UI/UX Design & Frontend Feature Dev** | [@MinhGiaVoNgo](https://github.com/MinhGiaVoNgo) |
+| 4 | **Nguyễn Huỳnh Tấn Phát** | 2412585 | **QA / Testing, Geofencing & Hardware Auth** | [@tanphat](https://github.com) |
 
 ---
 
@@ -196,8 +198,8 @@ QuickAttend1/
 
 1. **Clone repository:**
    ```bash
-   git clone https://github.com/<your-org>/quickattend.git
-   cd quickattend
+   git clone https://github.com/QuickAttend-Team/QuickAttend.git
+   cd QuickAttend
    ```
 
 2. **Cài đặt thư viện phụ thuộc:**
@@ -264,4 +266,3 @@ docs(readme): update milestone 2 roadmap and issue creation guide
 ## 11. Giấy phép
 
 Dự án được phân phối dưới giấy phép **MIT License**. Chi tiết xem tại [LICENSE](LICENSE).
-
