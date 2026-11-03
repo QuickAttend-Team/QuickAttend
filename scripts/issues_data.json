@@ -1,0 +1,87 @@
+[
+  {
+    "id": "M2-01",
+    "title": "[M2-01][UI/UX] Thiết kế hệ thống Design System & Wireframes/Hi-Fi Mockups trên Figma (Host & Guest flows)",
+    "labels": ["ui/ux", "enhancement"],
+    "body": "## 🎯 Mục tiêu\nThiết kế giao diện hoàn chỉnh, trực quan và tối ưu cho thiết bị di động trên Figma cho toàn bộ các luồng của Giảng viên (Host) và Sinh viên (Guest).\n\n## 📋 Công việc cụ thể\n- [ ] Xây dựng Design System: Bảng màu (Color palette), Typography, Iconography, Button styles, Bottom Sheet, Badges.\n- [ ] Thiết kế màn hình Sinh viên: Nút tròn 1-chạm 'ĐIỂM DANH NGAY', Bottom Sheet hiển thị trạng thái ca học, Popup xác thực tích xanh/lỗi.\n- [ ] Thiết kế màn hình Giảng viên: Danh sách thẻ mẫu ca học (Attendance Templates), Màn hình thiết lập bán kính GPS (20m/50m/100m) và lấy vị trí, Màn hình Active Session đếm ngược và giám sát sĩ số.\n- [ ] Thiết kế luồng Bàn giao quyền tạm thời (Temporary Delegation Sheet).\n- [ ] Tạo Figma Interactive Prototype kết nối các luồng.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- File Figma có đủ wireframe và hi-fi mockup cho cả 2 vai trò.\n- Thiết kế bám sát nguyên tắc tối giản (1-chạm) và kết quả khảo sát UX từ Milestone 1."
+  },
+  {
+    "id": "M2-02",
+    "title": "[M2-02][DevOps] Khởi tạo khung dự án React Native Expo SDK 52 với Expo Router & TypeScript",
+    "labels": ["devops", "frontend"],
+    "body": "## 🎯 Mục tiêu\nThiết lập kiến trúc mã nguồn ứng dụng di động chuẩn chỉnh, sẵn sàng cho các thành viên cùng phát triển tính năng mà không bị xung đột.\n\n## 📋 Công việc cụ thể\n- [ ] Khởi tạo thư mục ứng dụng di động với Expo SDK 52 + Expo Router.\n- [ ] Cấu hình TypeScript, ESLint, Prettier và Git Hooks.\n- [ ] Cài đặt các thư viện lõi: `expo-location`, `expo-local-authentication`, `expo-camera`, `zustand`, `lucide-react-native` (hoặc vector icons).\n- [ ] Thiết lập cấu trúc thư mục phân tầng (`src/components`, `src/hooks`, `src/services`, `src/stores`, `src/types`, `src/utils`).\n- [ ] Kiểm tra ứng dụng khởi chạy mượt mà trên Expo Go (iOS & Android).\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Lệnh `npm run dev:mobile` chạy thành công không cảnh báo lỗi.\n- Pipeline CI trên GitHub Actions kiểm tra lint và type-check màu xanh."
+  },
+  {
+    "id": "M2-03",
+    "title": "[M2-03][Backend] Thiết lập REST API Server & Cơ sở dữ liệu cho Users, Sessions, Templates & Attendance",
+    "labels": ["backend"],
+    "body": "## 🎯 Mục tiêu\nXây dựng hệ thống backend API và lược đồ cơ sở dữ liệu (PostgreSQL / Supabase) hỗ trợ đầy đủ các thực thể nghiệp vụ của QuickAttend.\n\n## 📋 Công việc cụ thể\n- [ ] Thiết kế CSDL quan hệ: Bảng `users`, `devices`, `attendance_templates`, `sessions`, `attendances`, `delegations`.\n- [ ] Cấu hình hàm tính toán khoảng cách tọa độ địa lý (Haversine Formula hoặc hàm khoảng cách ST_Distance).\n- [ ] Xây dựng khung API RESTful (Node.js/Express hoặc Supabase Edge Functions) với middleware xác thực JWT.\n- [ ] Viết tài liệu API Specs (Swagger / Postman Collection).\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Cơ sở dữ liệu được khởi tạo và kết nối thành công.\n- API CRUD cơ bản hoạt động đúng theo đặc tả."
+  },
+  {
+    "id": "M2-04",
+    "title": "[M2-04][US01][Auth] Xây dựng màn hình & API Đăng ký tài khoản Giảng viên bằng Email trường (.edu/.edu.vn)",
+    "labels": ["frontend", "backend", "us-feature"],
+    "body": "## 🎯 Liên kết User Story\n**US01:** As a Giảng viên (Host), I want to đăng ký tài khoản bằng email định danh của trường (.edu / .edu.vn), so that hệ thống tự động xác minh vai trò giảng viên và cho phép tôi tạo các mẫu điểm danh.\n\n## 📋 Công việc cụ thể\n- [ ] Xây dựng giao diện Form Đăng ký / Đăng nhập cho Giảng viên trên mobile app.\n- [ ] Triển khai validation kiểm tra định dạng email đuôi trường (`.edu`, `.edu.vn`, `@hcmut.edu.vn`).\n- [ ] Xây dựng API gửi mã OTP / link xác thực kích hoạt về hòm thư trường.\n- [ ] Cấp quyền tự động `ROLE_HOST` và lưu phiên đăng nhập (JWT token vào SecureStore).\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Chỉ email trường hợp lệ mới được đăng ký quyền Host.\n- Kích hoạt thành công chuyển hướng thẳng vào Host Home Dashboard."
+  },
+  {
+    "id": "M2-05",
+    "title": "[M2-05][US02][Auth] Triển khai màn hình Đăng ký Sinh viên & Khóa định danh phần cứng thiết bị (Hardware Binding)",
+    "labels": ["frontend", "backend", "security", "us-feature"],
+    "body": "## 🎯 Liên kết User Story\n**US02:** As a Sinh viên (Khách), I want to đăng ký tài khoản bằng email sinh viên và liên kết trực tiếp với thiết bị di động cá nhân, so that tôi có thể điểm danh nhanh chóng mà không lo bị kẻ khác mạo danh.\n\n## 📋 Công việc cụ thể\n- [ ] Xây dựng màn hình Đăng ký Sinh viên (MSSV, Họ tên, Email sinh viên).\n- [ ] Tích hợp hàm trích xuất mã nhận dạng phần cứng thiết bị duy nhất (`Hardware Identifier / Device UUID`).\n- [ ] Lưu cặp khóa `(student_id, device_uuid, device_model)` trên backend trong lần đăng nhập đầu tiên.\n- [ ] Kiểm tra và từ chối nếu phát hiện tài khoản đăng nhập trên thiết bị lạ (ngăn mượn máy điểm danh hộ).\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Sinh viên đăng nhập lần đầu tự động khóa với máy cá nhân.\n- Đăng nhập trên thiết bị khác sẽ bị chặn và thông báo liên hệ quản trị."
+  },
+  {
+    "id": "M2-06",
+    "title": "[M2-06][US03][Host] Xây dựng tính năng Quản lý Mẫu điểm danh ca học (Attendance Templates & Geofence GPS)",
+    "labels": ["frontend", "backend", "us-feature"],
+    "body": "## 🎯 Liên kết User Story\n**US03:** As a Giảng viên (Host), I want to tạo và lưu sẵn các mẫu điểm danh (bao gồm tên môn, phòng học, bán kính GPS), so that tôi không phải thiết lập lại các thông số này ở mỗi buổi học trên lớp.\n\n## 📋 Công việc cụ thể\n- [ ] Xây dựng màn hình/modal Tạo mới mẫu ca học (Tên môn, Mã môn, Phòng học, Bán kính Geofence: 20m, 50m, 100m).\n- [ ] Tích hợp nút 'Lấy vị trí hiện tại' (dùng `expo-location`) để tự động điền kinh độ/vĩ độ phòng học hiện tại.\n- [ ] Xây dựng API lưu, cập nhật và xóa mẫu ca học (`GET/POST/PUT/DELETE /api/templates`).\n- [ ] Hiển thị danh sách mẫu dạng thẻ Card đẹp mắt trên màn hình Host Home.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Giảng viên lưu được mẫu ca học và thấy danh sách mẫu sau khi mở lại app.\n- Lấy tọa độ GPS phòng học chính xác dưới 5 mét sai số."
+  },
+  {
+    "id": "M2-07",
+    "title": "[M2-07][US04][Host] Triển khai tính năng Khởi chạy phiên điểm danh 1 chạm (One-Tap Attendance Launch & Timer)",
+    "labels": ["frontend", "backend", "us-feature"],
+    "body": "## 🎯 Liên kết User Story\n**US04:** As a Giảng viên (Host), I want to bắt đầu phiên điểm danh chỉ với 1 nút bấm từ mẫu đã lưu, so that tôi có thể tiến hành điểm danh ngay lập tức mà không làm gián đoạn thời gian giảng dạy.\n\n## 📋 Công việc cụ thể\n- [ ] Thiết kế nút bấm nổi bật 'Bắt đầu ngay (1 chạm)' trên từng thẻ mẫu.\n- [ ] Viết API mở phiên `POST /api/sessions/start` sinh Session ID, thời gian bắt đầu và kết thúc (mặc định 10-15 phút).\n- [ ] Màn hình chuyển ngay sang chế độ Active Session kèm đồng hồ đếm ngược (Countdown Timer) thời gian thực.\n- [ ] Phát trạng thái phiên mở để các thiết bị sinh viên lân cận nhận diện được.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Thời gian từ lúc chạm nút đến khi phiên hoạt động trên server < 2 giây.\n- Đồng hồ đếm ngược hoạt động chính xác và tự động đóng phiên khi hết giờ."
+  },
+  {
+    "id": "M2-08",
+    "title": "[M2-08][US06][Host] Triển khai màn hình Giám sát phiên thời gian thực (Active Session Monitoring Dashboard)",
+    "labels": ["frontend", "backend", "us-feature"],
+    "body": "## 🎯 Liên kết User Story\n**US06:** As a Giảng viên (Host), I want to xem số lượng và danh sách sinh viên đã điểm danh hợp lệ theo thời gian thực, so that tôi nắm được sĩ số lớp học ngay lập tức.\n\n## 📋 Công việc cụ thể\n- [ ] Thiết kế bộ đếm sĩ số trực quan (ví dụ: `42 / 50 Sinh viên - 84%`).\n- [ ] Xây dựng danh sách cập nhật trực tiếp (Realtime List) hiển thị sinh viên vừa điểm danh kèm mốc thời gian.\n- [ ] Đánh dấu màu phân loại: Xanh lá (Hợp lệ trong bán kính), Đỏ/Cam (Ngoài vùng GPS / Thiết bị nghi vấn).\n- [ ] Nút 'Kết thúc & Đóng phiên' để chốt dữ liệu và lưu báo cáo buổi học.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Danh sách cập nhật tức thì khi sinh viên bấm điểm danh.\n- Giảng viên xem được tổng quan sĩ số và kết thúc phiên bất kỳ lúc nào."
+  },
+  {
+    "id": "M2-09",
+    "title": "[M2-09][US05][Host] Xây dựng tính năng Bàn giao quyền quản lý phiên tạm thời (Temporary Delegation / Handover)",
+    "labels": ["frontend", "backend", "us-feature"],
+    "body": "## 🎯 Liên kết User Story\n**US05:** As a Giảng viên (Host), I want to chia sẻ quyền quản lý phiên điểm danh tạm thời cho giảng viên dạy thay bằng cách nhập email của họ, so that giảng viên dạy thay có thể mở lớp điểm danh mà không cần tạo lại danh sách hay mẫu mới.\n\n## 📋 Công việc cụ thể\n- [ ] Xây dựng giao diện Bottom Sheet 'Bàn giao quyền phiên' trên thẻ mẫu hoặc phiên đang mở.\n- [ ] Form nhập email của đồng nghiệp/trợ giảng và chọn khung thời gian ủy quyền (ví dụ: 'Chỉ ca hôm nay' hoặc 'Trong 24h').\n- [ ] API backend kiểm tra email người nhận và cấp Token ủy quyền tạm thời (`Temporary Delegation Token`).\n- [ ] Giảng viên dạy thay khi đăng nhập sẽ thấy thẻ mẫu ca học được ủy quyền và có quyền bấm 'Bắt đầu phiên'.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Bàn giao quyền hoàn tất trong vòng 1-chạm không cần qua quản trị LMS.\n- Hết thời hạn ủy quyền, quyền tự động thu hồi về giảng viên chính."
+  },
+  {
+    "id": "M2-10",
+    "title": "[M2-10][US07][Guest] Phát triển màn hình Điểm danh 1 chạm cho Sinh viên kết hợp dịch vụ định vị GPS ngầm",
+    "labels": ["frontend", "mobile-sensor", "us-feature"],
+    "body": "## 🎯 Liên kết User Story\n**US07:** As a Sinh viên (Khách), I want to điểm danh chỉ bằng 1 nút bấm duy nhất trên màn hình, so that tôi có thể hoàn thành việc điểm danh trong chưa đầy 3 giây khi đã ngồi trong phòng học.\n\n## 📋 Công việc cụ thể\n- [ ] Xây dựng giao diện Guest Home với phong cách tối giản: duy nhất một nút bấm lớn 'ĐIỂM DANH NGAY'.\n- [ ] Xử lý xin quyền vị trí (`Foreground Location Permission`) khéo léo, giải thích lý do bảo mật.\n- [ ] Khi bấm nút, tự động lấy tọa độ GPS hiện tại với độ chuẩn xác cao (`Accuracy.Highest`).\n- [ ] Gửi payload nhẹ (lat, lng, accuracy, timestamp, device_uuid) lên API để so khớp với ca học đang mở.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Sinh viên không cần quét mã QR hay gõ mã lớp nếu đã có mặt trong phòng học.\n- Thao tác hoàn thành trong vòng dưới 3 giây."
+  },
+  {
+    "id": "M2-11",
+    "title": "[M2-11][US08][Guest] Xây dựng cơ chế Xác thực Đa yếu tố (GPS + Hardware Check) & Bottom Sheet thông báo tức thì",
+    "labels": ["frontend", "backend", "us-feature"],
+    "body": "## 🎯 Liên kết User Story\n**US08:** As a Sinh viên (Khách), I want to xác nhận thông tin ca học và nhận thông báo kết quả điểm danh ngay trên màn hình, so that tôi chắc chắn rằng lượt điểm danh của mình đã được hệ thống ghi nhận thành công.\n\n## 📋 Công việc cụ thể\n- [ ] Backend tính khoảng cách giữa tọa độ sinh viên và tâm phòng học của phiên mở (`distance <= radius`).\n- [ ] Backend kiểm tra tính khớp của Device UUID với tài khoản sinh viên đã đăng ký.\n- [ ] Trả về kết quả và hiển thị Bottom Sheet phản hồi tức thì trên máy sinh viên:\n  - Trạng thái THÀNH CÔNG: Tích xanh hoạt họa, tên môn học, phòng học, mốc thời gian chính xác (hh:mm:ss).\n  - Trạng thái NGOÀI VÙNG: Báo đỏ kèm thông điệp 'Bạn đang ở ngoài phạm vi phòng học' và khoảng cách lệch ước tính, cho phép 'Thử lại'.\n  - Trạng thái SAI THIẾT BỊ: Báo cam cảnh báo 'Tài khoản đã liên kết với thiết bị khác'.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Phản hồi kết quả trực quan trên màn hình ngay sau khi API trả kết quả.\n- Thông điệp lỗi rõ ràng, minh bạch (Privacy-First: chỉ lưu kết quả Inside Geofence)."
+  },
+  {
+    "id": "M2-12",
+    "title": "[M2-12][Resilience] Xây dựng Cơ chế Hàng đợi Ngoại tuyến (Offline Queue) & Cảnh báo Pin yếu/Mất mạng (Heartbeat)",
+    "labels": ["frontend", "backend", "enhancement"],
+    "body": "## 🎯 Mục tiêu\nGiải quyết triệt để 50% sự cố mạng yếu/Wi-Fi kém trong giảng đường theo số liệu khảo sát thực tế từ Milestone 1.\n\n## 📋 Công việc cụ thể\n- [ ] Tích hợp thư viện lưu trữ cục bộ (`AsyncStorage` hoặc `expo-sqlite`) làm bộ đệm ngoại tuyến (Offline Queue).\n- [ ] Khi gửi request điểm danh thất bại do mất mạng: Lưu trữ payload mã hóa cục bộ kèm timestamp và chữ ký thiết bị.\n- [ ] Tự động gửi lại (Retry & Sync) khi phát hiện thiết bị có kết nối Internet trở lại.\n- [ ] Xây dựng cơ chế Heartbeat nhẹ: Nếu pin sinh viên dưới 10% hoặc mất sóng, gửi tín hiệu khẩn cấp về máy giảng viên để giảng viên duyệt bổ sung 1-chạm.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Khi ngắt Wi-Fi/4G, sinh viên bấm điểm danh vẫn ghi nhận 'Đã lưu tạm ngoại tuyến'.\n- Khi bật mạng trở lại, hệ thống tự động đồng bộ lên máy chủ thành công."
+  },
+  {
+    "id": "M2-13",
+    "title": "[M2-13][Testing] Kiểm thử tích hợp luồng Host-Guest End-to-End & Thử nghiệm thực địa độ trôi GPS trong phòng học",
+    "labels": ["testing", "qa"],
+    "body": "## 🎯 Mục tiêu\nKiểm thử toàn diện luồng nghiệp vụ trên thiết bị thật, đo đạc độ trôi GPS trong phòng học nhiều tầng (Indoor GPS Drift) để tinh chỉnh bán kính mặc định.\n\n## 📋 Công việc cụ thể\n- [ ] Viết kịch bản kiểm thử (Test Plan) cho 8 User Stories (US01 -> US08).\n- [ ] Thực hiện kiểm thử trên các dòng máy khác nhau (iOS & Android, máy cấu hình thấp).\n- [ ] Thử nghiệm thực tế tại giảng đường Bách Khoa: Đo độ chính xác GPS ở tầng trệt và các tầng cao (tầng 3 - tầng 6).\n- [ ] Đánh giá hiệu năng mở phiên và bấm điểm danh đồng thời (Stress testing giả lập 30-50 users).\n- [ ] Ghi nhận bảng báo cáo lỗi (Bug tracking) và kết quả đo độ trôi vị trí.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Toàn bộ 8 User Stories vượt qua kiểm thử chấp nhận (Acceptance Tests).\n- Có dữ liệu đo đạc thực tế khuyến nghị bán kính phù hợp cho từng loại phòng học."
+  },
+  {
+    "id": "M2-14",
+    "title": "[M2-14][Docs] Hoàn thiện Báo cáo Milestone 2, Video Demo và Cập nhật GitHub Wiki & Board",
+    "labels": ["documentation"],
+    "body": "## 🎯 Mục tiêu\nTổng kết toàn bộ kết quả triển khai Milestone 2, chuẩn bị bài thuyết trình và nộp bài theo đúng quy định của môn học CO3043.\n\n## 📋 Công việc cụ thể\n- [ ] Viết Báo cáo kỹ thuật Milestone 2 (Kiến trúc hệ thống, Bảng phân rã tính năng, Kết quả kiểm thử, Đóng góp của từng thành viên).\n- [ ] Cập nhật bảng GitHub Project Board: Toàn bộ task được kéo về đúng trạng thái và liên kết Pull Requests.\n- [ ] Quay video demo sản phẩm (độ dài 3-5 phút) thể hiện rõ luồng Giảng viên mở phiên và Sinh viên bấm điểm danh 1-chạm.\n- [ ] Đóng gói slide thuyết trình và hoàn tất tài liệu Wiki dự án trên GitHub.\n\n## ✅ Tiêu chí nghiệm thu (Acceptance Criteria)\n- Báo cáo hoàn chỉnh đúng mẫu chuẩn Bách Khoa (PDF).\n- Video demo rõ nét thể hiện đầy đủ các tính năng MVP của Milestone 2."
+  }
+]
+

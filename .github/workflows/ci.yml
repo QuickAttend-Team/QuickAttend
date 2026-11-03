@@ -1,0 +1,46 @@
+name: QuickAttend CI Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  lint-and-validate:
+    name: Code Quality & Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Verify Project Structure
+        run: |
+          echo "Checking essential project files..."
+          test -f README.md || (echo "README.md missing" && exit 1)
+          test -f .gitignore || (echo ".gitignore missing" && exit 1)
+          echo "Project structure verified successfully."
+
+      - name: Install Dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci || npm install
+          else
+            echo "package.json not yet created at root, skipping npm install."
+          fi
+
+      - name: Run Linting (if configured)
+        run: |
+          if [ -f package.json ] && grep -q '"lint"' package.json; then
+            npm run lint
+          else
+            echo "Lint script not configured yet. Skipping."
+          fi
+
