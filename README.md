@@ -145,7 +145,7 @@ flowchart TD
 ## 7. Cấu trúc thư mục dự án
 
 ```text
-QuickAttend1/
+QuickAttend/
 ├── .github/
 │   ├── workflows/
 │   │   └── ci.yml                     # Pipeline kiểm tra tự động Lint & TypeCheck
@@ -175,10 +175,6 @@ QuickAttend1/
 ├── docs/                              # Tài liệu kỹ thuật, sơ đồ kiến trúc & User flows
 │   ├── architecture.md
 │   └── user_stories.md
-├── scripts/                           # Scripts tự động hóa tạo Issue & vận hành
-│   ├── create_issues.ps1              # Script tạo 1-click Issues qua GitHub REST API (PowerShell)
-│   ├── create_issues.sh               # Script tạo 1-click Issues (Bash)
-│   └── issues_data.json               # Dữ liệu 14 task của Milestone 2
 ├── .gitignore                         # Bộ lọc file theo dõi Git chuẩn
 ├── CONTRIBUTING.md                    # Hướng dẫn quy chuẩn đóng góp & Git flow
 ├── LICENSE                            # MIT License
@@ -258,7 +254,7 @@ QuickAttend1/
 Ví dụ:
 feat(auth): implement university email registration for host [#4]
 fix(location): resolve indoor gps radius boundary check [#10]
-docs(readme): update milestone 2 roadmap and issue creation guide
+docs(readme): update milestone 2 roadmap and project structure
 ```
 
 ---
