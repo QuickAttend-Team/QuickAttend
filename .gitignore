@@ -1,6 +1,6 @@
 # ==============================================================================
 # QuickAttend - .gitignore Configuration
-# Comprehensive gitignore for React Native, Expo, Node.js, Android, iOS, & IDEs
+# Comprehensive gitignore for pnpm Monorepo, React Native (Expo), Express, Prisma & PostgreSQL
 # ==============================================================================
 
 # OS generated files
@@ -13,7 +13,7 @@ ehthumbs.db
 Thumbs.db
 [Dd]esktop.ini
 
-# Node & Package Managers
+# Node & pnpm Package Manager
 node_modules/
 npm-debug.log*
 yarn-debug.log*
@@ -21,19 +21,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 .pnpm-store/
-.yarn/cache/
-.yarn/unplugged/
-.yarn/build-state.yml
+
+# TypeScript & Prisma generated artifacts
+*.tsbuildinfo
+src/generated/
+apps/*/src/generated/
 
 # Environment variables & Local configuration
 .env
-.env*.local
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-*.env
+.env.*
 !.env.example
+*.pem
+*.key
 
 # Build artifacts & caches
 dist/
@@ -53,7 +52,6 @@ web-build/
 *.jks
 *.p8
 *.p12
-*.key
 *.mobileprovision
 *.orig.*
 
@@ -91,8 +89,10 @@ xcuserdata/
 *.sublime-project
 *.sublime-workspace
 .fleet/
+*.swp
+*.swo
 
-# Temporary, scratch & logs
+# Temporary, scratch, reference & local scripts
 *.log
 *.tmp
 *.temp
@@ -100,4 +100,4 @@ tmp/
 temp/
 scratch/
 scripts/
-
+15-SPM-35/

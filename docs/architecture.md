@@ -19,10 +19,15 @@ QuickAttend được thiết kế theo kiến trúc hướng dịch vụ (Servic
   - Tự động kích hoạt đồng bộ khi có kết nối trở lại.
 
 ### 2.2. Tầng Máy chủ (Backend API & Business Logic)
-- **Runtime:** Node.js (TypeScript) với Express hoặc Fastify.
+- **Runtime & Ngôn ngữ:** Node.js 24 LTS + TypeScript 5.7+ (chạy qua `tsx`) sử dụng **Express 5**.
+- **Tổ chức theo Module (`apps/api/src/modules/`):** `identity`, `templates`, `sessions`, `delegation`, `attendance`.
+- **Validation & Bảo mật:**
+  - Dùng **Zod** (chia sẻ qua `@quickattend/contracts`) để validate đầu vào đồng nhất giữa Mobile và API.
+  - Dùng **Argon2** băm mật khẩu/mã xác thực, `node:crypto` (HMAC-SHA256) sinh OTP & Delegation Token.
+  - Dùng **`rate-limiter-flexible`** chống nghẽn/spam khi 50–100 sinh viên điểm danh đồng thời.
 - **Authentication Service:**
   - Kiểm tra tên miền email trường hợp lệ (`@hcmut.edu.vn`, `@*.edu.vn`).
-  - Cấp phát JWT token kèm phân quyền `ROLE_HOST` (Giảng viên) và `ROLE_GUEST` (Sinh viên).
+  - Cấp phát token kèm phân quyền `ROLE_HOST` (Giảng viên) và `ROLE_GUEST` (Sinh viên).
 - **Session & Handover Engine:**
   - Quản lý vòng đời phiên điểm danh (Active, Closed, Expired).
   - Quản lý mã phiên (Session Code) và cơ chế ủy quyền tạm thời (Temporary Delegation Token) có thời hạn cho giảng viên dạy thay.
@@ -32,7 +37,8 @@ QuickAttend được thiết kế theo kiến trúc hướng dịch vụ (Servic
   - Kiểm tra bất thường di chuyển (Impossible Travel Velocity).
 
 ### 2.3. Tầng Dữ liệu (Persistence Layer)
-- **Cơ sở dữ liệu chính:** PostgreSQL (hoặc Supabase PostgreSQL).
+- **Cơ sở dữ liệu & ORM:** **PostgreSQL 18** kết hợp **Prisma 7** (`prisma.config.ts`, `prisma/schema.prisma`, `@prisma/adapter-pg`).
+- **Kiểm thử nghiệp vụ:** Dùng `node:test` + `node:assert/strict` chạy qua `tsx --test` cho các hàm nghiệp vụ thuần không phụ thuộc DB.
 - **Các bảng chính:**
   - `users`: Thông tin người dùng, vai trò (Host/Guest), email trường.
   - `devices`: Bản đồ định danh phần cứng (user_id, device_uuid, device_model).

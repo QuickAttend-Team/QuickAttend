@@ -8,38 +8,49 @@ on:
 
 jobs:
   lint-and-validate:
-    name: Code Quality & Type Check
+    name: Code Quality, Typecheck & Unit Tests
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.18.0
+
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Verify Project Structure
         run: |
-          echo "Checking essential project files..."
+          echo "Checking essential monorepo files..."
           test -f README.md || (echo "README.md missing" && exit 1)
           test -f .gitignore || (echo ".gitignore missing" && exit 1)
-          echo "Project structure verified successfully."
+          test -f pnpm-workspace.yaml || (echo "pnpm-workspace.yaml missing" && exit 1)
+          test -f package.json || (echo "package.json missing" && exit 1)
+          test -f .env.example || (echo ".env.example missing" && exit 1)
+          test -f apps/api/package.json || (echo "apps/api/package.json missing" && exit 1)
+          test -f apps/mobile/package.json || (echo "apps/mobile/package.json missing" && exit 1)
+          test -f packages/contracts/package.json || (echo "packages/contracts/package.json missing" && exit 1)
+          echo "Monorepo structure verified successfully."
 
-      - name: Install Dependencies
+      - name: Install Dependencies (when lockfile exists)
         run: |
-          if [ -f package.json ]; then
-            npm ci || npm install
+          if [ -f pnpm-lock.yaml ]; then
+            pnpm install --frozen-lockfile
           else
-            echo "package.json not yet created at root, skipping npm install."
+            echo "pnpm-lock.yaml not generated yet (skeleton stage). Skipping install."
           fi
 
-      - name: Run Linting (if configured)
+      - name: Run Typecheck & Unit Tests
         run: |
-          if [ -f package.json ] && grep -q '"lint"' package.json; then
-            npm run lint
+          if [ -f pnpm-lock.yaml ]; then
+            pnpm typecheck
+            pnpm test
           else
-            echo "Lint script not configured yet. Skipping."
+            echo "Dependencies not installed yet. Skipping typecheck and unit tests."
           fi
-
