@@ -1,9 +1,5 @@
-// QuickAttend - Prisma Schema (PostgreSQL 18 + Prisma 7)
-// Khung thiết kế CSDL cho Task M2-03. Thành viên phụ trách (Thiện Nhân) sẽ
-// bổ sung các models: User, Device, AttendanceTemplate, Session, AttendanceRecord, Delegation.
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -11,3 +7,156 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  userId    Int      @id @default(autoincrement()) @map("user_id")
+  fullName  String   @map("full_name") @db.VarChar(120)
+  email     String   @unique @db.VarChar(120)
+  phone     String?  @db.VarChar(20)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  roles              UserRole[]
+  account            Account?
+  deviceBindings     DeviceBinding[]
+  templates          AttendanceTemplate[] @relation("HostTemplates")
+  hostedSessions     AttendanceSession[]  @relation("OriginalHostSessions")
+  delegatedSessions  AttendanceSession[]  @relation("ActiveHostSessions")
+  attendanceRecords  AttendanceRecord[]   @relation("GuestAttendances")
+  delegationsSent    SessionDelegation[]  @relation("DelegationSender")
+  delegationsRecv    SessionDelegation[]  @relation("DelegationReceiver")
+  feedbacks          SessionFeedback[]
+
+  @@map("users")
+}
+
+model UserRole {
+  userId Int    @map("user_id")
+  role   String @db.VarChar(30) // ROLE_HOST, ROLE_GUEST, ROLE_ADMIN
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, role])
+  @@map("user_roles")
+}
+
+model Account {
+  accountId    Int      @id @default(autoincrement()) @map("account_id")
+  userId       Int      @unique @map("user_id")
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  status       String   @default("ACTIVE") @db.VarChar(30) // ACTIVE, DISABLED
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model DeviceBinding {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  deviceUuid String   @unique @map("device_uuid") @db.VarChar(128)
+  deviceName String?  @map("device_name") @db.VarChar(120)
+  platform   String   @db.VarChar(30) // IOS, ANDROID
+  isTrusted  Boolean  @default(true) @map("is_trusted")
+  boundAt    DateTime @default(now()) @map("bound_at")
+  lastUsedAt DateTime @default(now()) @map("last_used_at")
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@map("device_bindings")
+}
+
+model AttendanceTemplate {
+  id              Int      @id @default(autoincrement())
+  hostId          Int      @map("host_id")
+  title           String   @db.VarChar(150)
+  roomName        String   @map("room_name") @db.VarChar(60)
+  latitude        Float
+  longitude       Float
+  radiusMeters    Int      @default(20) @map("radius_meters") // 20, 50, 100
+  durationMinutes Int      @default(15) @map("duration_minutes")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  host     User                @relation("HostTemplates", fields: [hostId], references: [userId], onDelete: Cascade)
+  sessions AttendanceSession[]
+
+  @@map("attendance_templates")
+}
+
+model AttendanceSession {
+  id              Int       @id @default(autoincrement())
+  templateId      Int?      @map("template_id")
+  hostId          Int       @map("host_id")
+  activeHostId    Int       @map("active_host_id")
+  sessionCode     String    @map("session_code") @db.VarChar(10)
+  title           String    @db.VarChar(150)
+  roomName        String    @map("room_name") @db.VarChar(60)
+  latitude        Float
+  longitude       Float
+  radiusMeters    Int       @default(20) @map("radius_meters")
+  durationMinutes Int       @default(15) @map("duration_minutes")
+  status          String    @default("ACTIVE") @db.VarChar(30) // ACTIVE, CLOSED
+  startedAt       DateTime  @default(now()) @map("started_at")
+  endedAt         DateTime? @map("ended_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  template    AttendanceTemplate?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  host        User                 @relation("OriginalHostSessions", fields: [hostId], references: [userId], onDelete: Cascade)
+  activeHost  User                 @relation("ActiveHostSessions", fields: [activeHostId], references: [userId], onDelete: Cascade)
+  attendances AttendanceRecord[]
+  delegations SessionDelegation[]
+  feedbacks   SessionFeedback[]
+
+  @@map("attendance_sessions")
+}
+
+model AttendanceRecord {
+  id             Int      @id @default(autoincrement())
+  sessionId      Int      @map("session_id")
+  guestId        Int      @map("guest_id")
+  deviceUuid     String   @map("device_uuid") @db.VarChar(128)
+  status         String   @db.VarChar(30) // VALID, FLAGGED, REJECTED
+  distanceMeters Float    @map("distance_meters")
+  isOfflineSync  Boolean  @default(false) @map("is_offline_sync")
+  checkedInAt    DateTime @default(now()) @map("checked_in_at")
+
+  session AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  guest   User              @relation("GuestAttendances", fields: [guestId], references: [userId], onDelete: Cascade)
+
+  @@unique([sessionId, guestId])
+  @@map("attendance_records")
+}
+
+model SessionDelegation {
+  id             Int       @id @default(autoincrement())
+  sessionId      Int       @map("session_id")
+  senderId       Int       @map("sender_id")
+  receiverEmail  String    @map("receiver_email") @db.VarChar(120)
+  receiverId     Int?      @map("receiver_id")
+  status         String    @default("PENDING") @db.VarChar(30) // PENDING, ACCEPTED, REVOKED, EXPIRED
+  delegatedUntil DateTime  @map("delegated_until")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  respondedAt    DateTime? @map("responded_at")
+
+  session  AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender   User              @relation("DelegationSender", fields: [senderId], references: [userId], onDelete: Cascade)
+  receiver User?             @relation("DelegationReceiver", fields: [receiverId], references: [userId], onDelete: SetNull)
+
+  @@map("session_delegations")
+}
+
+model SessionFeedback {
+  id          Int      @id @default(autoincrement())
+  sessionId   Int      @map("session_id")
+  guestId     Int      @map("guest_id")
+  rating      Int      // 1 to 5 stars
+  comment     String?  @db.VarChar(500)
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  session AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  guest   User              @relation(fields: [guestId], references: [userId], onDelete: Cascade)
+
+  @@unique([sessionId, guestId])
+  @@map("session_feedbacks")
+}
