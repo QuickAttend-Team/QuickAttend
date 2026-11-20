@@ -11,6 +11,8 @@
   "scripts": {
     "dev:api": "pnpm --filter @quickattend/api dev",
     "dev:mobile": "pnpm --filter @quickattend/mobile start",
+    "dev:mobile:tunnel": "pnpm --filter @quickattend/mobile start --tunnel",
+    "dev:mobile:web": "pnpm --filter @quickattend/mobile start --web",
     "build": "pnpm --filter @quickattend/contracts build && pnpm --filter @quickattend/api build",
     "start:api": "pnpm --filter @quickattend/api start",
     "lint": "pnpm -r --if-present lint",
