@@ -13,6 +13,7 @@ import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-ic
 import { useCountdown } from "../../src/hooks/useCountdown";
 import { DelegationModal } from "../../src/components/DelegationModal";
 import { CustomAlertModal } from "../../src/components/CustomAlertModal";
+import { delegationService } from "../../src/services/delegationService";
 import { FONTS, COLORS, RADIUS } from "../../src/theme/typography";
 
 interface StudentFeedItem {
@@ -116,10 +117,20 @@ export default function ActiveSessionScreen() {
     router.replace("/(host)");
   };
 
-  const handleDelegateConfirm = (email: string, hours: number) => {
-    setDelegateAlertMsg(
-      `Đã bàn giao quyền quản lý ca học này cho giảng viên ${email} trong ${hours} giờ.`
-    );
+  const handleDelegateConfirm = async (email: string, hours: number) => {
+    try {
+      const response = await delegationService.delegate({
+        sessionId: 101,
+        receiverEmail: email,
+        durationHours: hours,
+      });
+      setDelegateAlertMsg(
+        `Đã bàn giao quyền quản lý phiên điểm danh này cho giảng viên ${response.receiverEmail} trong ${hours} giờ.`
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Có lỗi khi kết nối ủy quyền";
+      setDelegateAlertMsg(msg);
+    }
   };
 
   return (
@@ -429,6 +440,7 @@ export default function ActiveSessionScreen() {
         visible={isDelegationOpen}
         onClose={() => setIsDelegationOpen(false)}
         onDelegate={handleDelegateConfirm}
+        targetTitle={title}
       />
 
       {/* Custom Confirmation Modal for End Session */}

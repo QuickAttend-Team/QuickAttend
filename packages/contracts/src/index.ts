@@ -97,6 +97,8 @@ export const checkInSchema = z.object({
   deviceUuid: z.string().min(10, "Mã thiết bị không hợp lệ"),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
+  isMocked: z.boolean().default(false),
+  accuracy: z.number().optional(),
   isOfflineSync: z.boolean().default(false),
   clientTimestamp: z.string().datetime().optional(),
 });
@@ -111,7 +113,8 @@ export type OfflineSyncBatchInput = z.infer<typeof offlineSyncBatchSchema>;
  * Delegation & Feedback Schemas
  */
 export const delegateSessionSchema = z.object({
-  sessionId: z.number().int().positive(),
+  sessionId: z.number().int().positive().optional(),
+  templateId: z.number().int().positive().optional(),
   receiverEmail: z.string().regex(EDU_EMAIL_REGEX, "Email người nhận phải thuộc tên miền .edu / .edu.vn"),
   durationHours: z.number().int().min(1).max(72).default(4),
 });
