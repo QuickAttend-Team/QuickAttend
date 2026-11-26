@@ -2,11 +2,15 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { env } from "./config/env.js";
 import { DomainError } from "./lib/errors.js";
+import { delegationRouter } from "./modules/delegation/delegation.routes.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use("/api/v1/delegations", delegationRouter);
 
 // Healthcheck
 app.get("/api/health", (_req: Request, res: Response) => {

@@ -5,7 +5,8 @@ export interface LocationCoordinates {
   latitude: number;
   longitude: number;
   accuracy: number | null;
-  isMocked?: boolean;
+  isMocked: boolean;
+  mockWarning?: string;
 }
 
 export function useLocation() {
@@ -20,7 +21,8 @@ export function useLocation() {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        setError("Ứng dụng cần quyền vị trí để xác thực phạm vi phòng học.");
+        const msg = "Ứng dụng cần quyền vị trí để xác thực phạm vi phòng học.";
+        setError(msg);
         setLoading(false);
         return null;
       }
@@ -29,15 +31,36 @@ export function useLocation() {
         accuracy: Location.Accuracy.High,
       });
 
+      // Anti-Fake GPS Checks:
+      // 1. Native flag provided by Android/iOS Mock Location Provider
+      let isMocked = Boolean(loc.mocked);
+      let mockWarning: string | undefined;
+
+      if (isMocked) {
+        mockWarning = "Phát hiện thiết bị đang bật chế độ Giả lập vị trí (Mock Location / Fake GPS).";
+      }
+
+      // 2. Suspicious zero-accuracy or impossible altitude / speed anomalies
+      if (!isMocked && loc.coords.accuracy === 0) {
+        isMocked = true;
+        mockWarning = "Độ chính xác GPS bất thường (0m), nghi vấn sử dụng công cụ Fake GPS.";
+      }
+
       const result: LocationCoordinates = {
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
         accuracy: loc.coords.accuracy,
-        isMocked: loc.mocked,
+        isMocked,
+        mockWarning,
       };
 
       setCoords(result);
       setLoading(false);
+
+      if (isMocked) {
+        setError(mockWarning || "Phát hiện phần mềm can thiệp tọa độ GPS.");
+      }
+
       return result;
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Không lấy được vị trí GPS";

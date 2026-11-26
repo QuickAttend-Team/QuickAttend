@@ -11,14 +11,18 @@ import { useRouter } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTemplateStore, TemplateItem } from "../../src/stores/templateStore";
 import { DelegationModal } from "../../src/components/DelegationModal";
+import { delegationService } from "../../src/services/delegationService";
 import { FONTS, COLORS, RADIUS } from "../../src/theme/typography";
 
 export default function HostDashboardScreen() {
   const router = useRouter();
   const templates = useTemplateStore((state) => state.templates);
+  const receivedTemplates = useTemplateStore((state) => state.receivedTemplates);
+  const delegateTemplate = useTemplateStore((state) => state.delegateTemplate);
+  const revokeDelegation = useTemplateStore((state) => state.revokeDelegation);
 
   const [isDelegationOpen, setIsDelegationOpen] = useState(false);
-  const [selectedClassTitle, setSelectedClassTitle] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateItem | null>(null);
 
   const handleStartSession = (template: TemplateItem) => {
     router.push({
@@ -31,16 +35,31 @@ export default function HostDashboardScreen() {
     });
   };
 
-  const handleOpenDelegation = (title: string) => {
-    setSelectedClassTitle(title);
+  const handleOpenDelegation = (template: TemplateItem) => {
+    setSelectedTemplate(template);
     setIsDelegationOpen(true);
   };
 
-  const handleDelegateConfirm = (email: string, hours: number) => {
-    Alert.alert(
-      "Ủy quyền thành công",
-      `Đã bàn giao quyền quản lý ca học ${selectedClassTitle} cho giảng viên ${email} trong ${hours} giờ.`
-    );
+  const handleDelegateConfirm = async (email: string, hours: number) => {
+    if (!selectedTemplate) return;
+
+    try {
+      const response = await delegationService.delegate({
+        templateId: selectedTemplate.id,
+        receiverEmail: email,
+        durationHours: hours,
+      });
+
+      delegateTemplate(selectedTemplate.id, response.receiverEmail, hours);
+
+      Alert.alert(
+        "Ủy quyền thành công",
+        `Đã bàn giao quyền quản lý ca học "${selectedTemplate.title}" cho giảng viên ${response.receiverEmail} trong ${hours} giờ.`
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Có lỗi khi kết nối ủy quyền";
+      Alert.alert("Ủy quyền thất bại", msg);
+    }
   };
 
   return (
@@ -68,7 +87,12 @@ export default function HostDashboardScreen() {
           </View>
         </View>
 
-        {/* List of Class Cards */}
+        {/* Section: My Class Templates */}
+        <View style={styles.hostManage__sectionHeader_01}>
+          <Ionicons name="calendar-outline" size={17} color={COLORS.textDark} style={{ marginRight: 6 }} />
+          <Text style={styles.hostManage__sectionTitle_01}>Ca học của tôi</Text>
+        </View>
+
         <View style={styles.hostManage__cardsContainer_01}>
           {templates.map((item) => (
             <View key={`template-${item.id}`} style={styles.hostManage__card_01}>
@@ -104,39 +128,41 @@ export default function HostDashboardScreen() {
                     style={{ marginRight: 4 }}
                   />
                   <Text style={styles.hostManage__metaPillText_01}>
-                    GPS: Bán kính {item.radiusMeters}m
+                    GPS ({item.radiusMeters}m)
+                  </Text>
+                </View>
+
+                <View style={styles.hostManage__metaPill_01}>
+                  <MaterialCommunityIcons
+                    name="timer-outline"
+                    size={14}
+                    color={COLORS.textMuted}
+                    style={{ marginRight: 4 }}
+                  />
+                  <Text style={styles.hostManage__metaPillText_01}>
+                    {item.durationMinutes} phút
                   </Text>
                 </View>
               </View>
 
-              {/* Beacon Badge */}
-              <View
-                style={[
-                  styles.hostManage__beaconBadge_01,
-                  item.beaconActive
-                    ? styles.hostManage__beaconBadgeActive_01
-                    : styles.hostManage__beaconBadgeInactive_01,
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name="broadcast"
-                  size={14}
-                  color={item.beaconActive ? COLORS.primaryGreenDark : COLORS.textMuted}
-                  style={{ marginRight: 6 }}
-                />
-                <Text
+              {/* Real-time Beacon Status */}
+              <View style={styles.hostManage__beaconRow_01}>
+                <View
                   style={[
-                    styles.hostManage__beaconBadgeText_01,
-                    item.beaconActive
-                      ? styles.hostManage__beaconTextActive_01
-                      : styles.hostManage__beaconTextInactive_01,
+                    styles.hostManage__beaconDot_01,
+                    {
+                      backgroundColor: item.beaconActive
+                        ? COLORS.primaryGreen
+                        : COLORS.textMuted,
+                    },
                   ]}
-                >
+                />
+                <Text style={styles.hostManage__beaconText_01}>
                   {item.beaconText || "Beacon: Trạm tự động"}
                 </Text>
               </View>
 
-              {/* Student Count Row */}
+              {/* Students count info */}
               <View style={styles.hostManage__studentsRow_01}>
                 <MaterialCommunityIcons
                   name="shield-check-outline"
@@ -149,7 +175,7 @@ export default function HostDashboardScreen() {
                 </Text>
               </View>
 
-              {/* Primary Start Session Button (Lightning bolt neon green) */}
+              {/* Primary Start Session Button */}
               <TouchableOpacity
                 style={styles.hostManage__startButton_01}
                 onPress={() => handleStartSession(item)}
@@ -164,25 +190,100 @@ export default function HostDashboardScreen() {
                 <Text style={styles.hostManage__startButtonText_01}>Bắt đầu ngay</Text>
               </TouchableOpacity>
 
-              {/* Secondary Link: Delegate to TA / Substitute Teacher */}
-              <TouchableOpacity
-                style={styles.hostManage__delegateLink_01}
-                onPress={() => handleOpenDelegation(item.title)}
-                activeOpacity={0.8}
-              >
-                <Ionicons
-                  name="swap-horizontal"
-                  size={15}
-                  color={COLORS.textMuted}
-                  style={{ marginRight: 6 }}
-                />
-                <Text style={styles.hostManage__delegateLinkText_01}>
-                  Bàn giao quyền cho GV dạy thay
-                </Text>
-              </TouchableOpacity>
+              {/* Delegation Section: Active Status or Action Link */}
+              {item.isDelegated ? (
+                <View style={styles.hostManage__delegatedBanner_01}>
+                  <View style={styles.hostManage__delegatedInfo_01}>
+                    <Ionicons name="time-outline" size={15} color="#0284C7" style={{ marginRight: 5 }} />
+                    <Text style={styles.hostManage__delegatedBannerText_01} numberOfLines={1}>
+                      Ủy quyền: {item.delegatedToEmail} ({item.delegatedHours}h)
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      revokeDelegation(item.id);
+                      Alert.alert("Thu hồi thành công", "Đã thu hồi quyền quản lý ca học.");
+                    }}
+                    style={styles.hostManage__revokeBtn_01}
+                  >
+                    <Text style={styles.hostManage__revokeBtnText_01}>Thu hồi</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.hostManage__delegateLink_01}
+                  onPress={() => handleOpenDelegation(item)}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons
+                    name="swap-horizontal"
+                    size={15}
+                    color={COLORS.textMuted}
+                    style={{ marginRight: 6 }}
+                  />
+                  <Text style={styles.hostManage__delegateLinkText_01}>
+                    Bàn giao quyền cho GV dạy thay
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           ))}
         </View>
+
+        {/* Section: Received Delegations from Colleagues */}
+        {receivedTemplates.length > 0 && (
+          <View style={styles.hostManage__receivedSection_01}>
+            <View style={styles.hostManage__sectionHeader_01}>
+              <Ionicons name="git-pull-request-outline" size={17} color="#0284C7" style={{ marginRight: 6 }} />
+              <Text style={[styles.hostManage__sectionTitle_01, { color: "#0369A1" }]}>
+                Ca học được ủy quyền nhận
+              </Text>
+            </View>
+
+            {receivedTemplates.map((item) => (
+              <View
+                key={`received-${item.id}`}
+                style={[styles.hostManage__card_01, styles.hostManage__receivedCard_01]}
+              >
+                <View style={styles.hostManage__cardHeaderRow_01}>
+                  <Text style={styles.hostManage__courseTitle_01} numberOfLines={1}>
+                    {item.title}
+                  </Text>
+                  <View style={styles.hostManage__receivedBadge_01}>
+                    <Text style={styles.hostManage__receivedBadgeText_01}>Được ủy quyền</Text>
+                  </View>
+                </View>
+
+                <View style={styles.hostManage__delegatedFromRow_01}>
+                  <Ionicons name="person-outline" size={13} color="#0369A1" style={{ marginRight: 4 }} />
+                  <Text style={styles.hostManage__delegatedFromText_01}>
+                    Ủy quyền bởi: {item.delegatedFromEmail} ({item.delegatedHours}h)
+                  </Text>
+                </View>
+
+                <View style={styles.hostManage__pillsRow_01}>
+                  <View style={styles.hostManage__metaPill_01}>
+                    <Ionicons name="location-outline" size={14} color={COLORS.textMuted} style={{ marginRight: 4 }} />
+                    <Text style={styles.hostManage__metaPillText_01}>{item.roomName}</Text>
+                  </View>
+                  <View style={styles.hostManage__metaPill_01}>
+                    <MaterialCommunityIcons name="timer-outline" size={14} color={COLORS.textMuted} style={{ marginRight: 4 }} />
+                    <Text style={styles.hostManage__metaPillText_01}>{item.durationMinutes} phút</Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.hostManage__startButton_01, { backgroundColor: "#0284C7" }]}
+                  onPress={() => handleStartSession(item)}
+                  activeOpacity={0.88}
+                >
+                  <Ionicons name="flash" size={16} color="#FFFFFF" style={{ marginRight: 8 }} />
+                  <Text style={styles.hostManage__startButtonText_01}>Chủ trì ca dạy thay</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* Bottom Section: Create New Template Button & Security Note */}
         <View style={styles.hostManage__bottomSection_01}>
@@ -193,7 +294,7 @@ export default function HostDashboardScreen() {
           >
             <Ionicons
               name="add-circle-outline"
-              size={20}
+              size={18}
               color="#334155"
               style={{ marginRight: 8 }}
             />
@@ -221,6 +322,7 @@ export default function HostDashboardScreen() {
         visible={isDelegationOpen}
         onClose={() => setIsDelegationOpen(false)}
         onDelegate={handleDelegateConfirm}
+        targetTitle={selectedTemplate?.title}
       />
     </View>
   );
@@ -287,21 +389,39 @@ const styles = StyleSheet.create({
     borderWidth: 2.5,
     borderColor: "#FFFFFF",
   },
+  hostManage__sectionHeader_01: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    marginTop: 6,
+  },
+  hostManage__sectionTitle_01: {
+    fontFamily: FONTS.bold,
+    fontSize: 16,
+    color: COLORS.textDark,
+  },
   hostManage__cardsContainer_01: {
     gap: 16,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   hostManage__card_01: {
     backgroundColor: "#FFFFFF",
-    borderRadius: RADIUS.xxl,
+    borderRadius: RADIUS.lg,
     padding: 20,
+    shadowColor: "#0F172A",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 16,
+    elevation: 2,
     borderWidth: 1,
     borderColor: "#F1F5F9",
-    shadowColor: "#000000",
-    shadowOpacity: 0.04,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 10,
-    elevation: 2,
+  },
+  hostManage__receivedSection_01: {
+    marginBottom: 16,
+  },
+  hostManage__receivedCard_01: {
+    borderColor: "#BAE6FD",
+    backgroundColor: "#F0F9FF",
   },
   hostManage__cardHeaderRow_01: {
     flexDirection: "row",
@@ -310,71 +430,89 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   hostManage__courseTitle_01: {
-    flex: 1,
     fontFamily: FONTS.bold,
-    fontSize: 19,
+    fontSize: 18,
     color: COLORS.textDark,
-    paddingRight: 8,
+    flex: 1,
+    marginRight: 10,
   },
   hostManage__shiftBadge_01: {
     backgroundColor: "#F1F5F9",
-    paddingHorizontal: 12,
-    paddingVertical: 5,
     borderRadius: RADIUS.full,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
   hostManage__shiftBadgeText_01: {
     fontFamily: FONTS.medium,
+    fontSize: 11,
+    color: COLORS.textMuted,
+  },
+  hostManage__receivedBadge_01: {
+    backgroundColor: "#E0F2FE",
+    borderRadius: RADIUS.full,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  hostManage__receivedBadgeText_01: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 11,
+    color: "#0284C7",
+  },
+  hostManage__delegatedFromRow_01: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  hostManage__delegatedFromText_01: {
+    fontFamily: FONTS.medium,
     fontSize: 12,
-    color: "#334155",
+    color: "#0369A1",
   },
   hostManage__pillsRow_01: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginBottom: 10,
+    marginBottom: 14,
   },
   hostManage__metaPill_01: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: "#F8FAFC",
     borderRadius: RADIUS.full,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
   },
   hostManage__metaPillText_01: {
     fontFamily: FONTS.medium,
     fontSize: 12,
-    color: "#334155",
+    color: COLORS.textMuted,
   },
-  hostManage__beaconBadge_01: {
+  hostManage__beaconRow_01: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: RADIUS.full,
     marginBottom: 12,
   },
-  hostManage__beaconBadgeActive_01: {
-    backgroundColor: "#DCFCE7",
+  hostManage__beaconDot_01: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
   },
-  hostManage__beaconBadgeInactive_01: {
-    backgroundColor: "#F1F5F9",
-  },
-  hostManage__beaconBadgeText_01: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 12,
-  },
-  hostManage__beaconTextActive_01: {
-    color: COLORS.primaryGreenDark,
-  },
-  hostManage__beaconTextInactive_01: {
+  hostManage__beaconText_01: {
+    fontFamily: FONTS.regular,
+    fontSize: 13,
     color: COLORS.textMuted,
   },
   hostManage__studentsRow_01: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 16,
+    backgroundColor: "#F8FAFC",
+    borderRadius: RADIUS.md,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 18,
   },
   hostManage__studentsCountText_01: {
     fontFamily: FONTS.medium,
@@ -411,6 +549,43 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.medium,
     fontSize: 13,
     color: COLORS.textMuted,
+  },
+  hostManage__delegatedBanner_01: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#F0F9FF",
+    borderWidth: 1,
+    borderColor: "#BAE6FD",
+    borderRadius: RADIUS.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 10,
+  },
+  hostManage__delegatedInfo_01: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    marginRight: 8,
+  },
+  hostManage__delegatedBannerText_01: {
+    fontFamily: FONTS.medium,
+    fontSize: 12,
+    color: "#0369A1",
+    flex: 1,
+  },
+  hostManage__revokeBtn_01: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#BAE6FD",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  hostManage__revokeBtnText_01: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 11,
+    color: "#0284C7",
   },
   hostManage__bottomSection_01: {
     marginTop: 4,
